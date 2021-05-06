@@ -23,6 +23,7 @@ parser.add_argument('--lr', type=float, default=0.001,
         help='Learning rate')
 parser.add_argument('--epochs', type=int, default=20,
         help='Epochs')
+parser.add_argument('--output_folder', type=str, help='Path to folder to write models to. If omitted, nothing is written')
 args = parser.parse_args()
 
 train.train(args)

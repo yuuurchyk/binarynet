@@ -4,6 +4,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
+import os
+import sys
 
 import torch
 import torch.nn as nn
@@ -32,6 +34,14 @@ def train(args):
     # net = nn.DataParallel(net)
     print(net)
 
+    output_folder = vars(args).get('output_folder')
+
+    if output_folder is not None:
+        assert not os.path.exists(output_folder)
+        os.makedirs(output_folder, exist_ok=False)
+        with open(os.path.join(output_folder, 'command.txt'), 'w') as f:
+            f.write(' '.join(sys.argv))
+
     if args.cuda:
         net.cuda()
 
@@ -41,6 +51,11 @@ def train(args):
     for epoch in range(1, args.epochs+1):
         train_epoch(epoch, net, creterion, optimizer, train_loader, args)
         test_epoch(net, creterion, test_loader, args)
+
+        if output_folder is not None:
+            state_dict = {key: value.cpu() for key, value in net.state_dict().items()}
+            torch.save(state_dict, os.path.join(output_folder, '%s.pth' % (epoch, )))
+
 
 def train_epoch(epoch, net, creterion, optimizer, train_loader, args, valid_data=None):
     losses = 0
