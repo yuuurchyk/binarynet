@@ -28,7 +28,7 @@ def train(args):
                        transform=transforms.ToTensor()),
                        batch_size=args.test_batch_size, shuffle=True, **kwargs)
 
-    net = model.BinaryConnect(args.in_features, args.out_features)
+    net = model.BinaryConnect(args.topology, args.batch_norm)
     # net = nn.DataParallel(net)
     print(net)
 
