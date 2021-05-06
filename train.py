@@ -7,7 +7,6 @@ from __future__ import absolute_import
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data as data
 from torch.autograd import Variable
@@ -29,10 +28,7 @@ def train(args):
                        transform=transforms.ToTensor()),
                        batch_size=args.test_batch_size, shuffle=True, **kwargs)
 
-    if args.binary == 'connect':
-        net = model.BinaryConnect(args.in_features, args.out_features)
-    else:
-        net = model.BinaryNet(args.in_features, args.out_features)
+    net = model.BinaryConnect(args.in_features, args.out_features)
     # net = nn.DataParallel(net)
     print(net)
 

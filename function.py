@@ -5,8 +5,6 @@ from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
 
-import torch
-import torch.nn.functional as F
 from torch.autograd import Function
 
 def where(cond, x1, x2):
@@ -35,20 +33,5 @@ class BinaryLinearFunction(Function):
             grad_bias = grad_output.sum(0).squeeze(0)
         return grad_input, grad_weight, grad_bias
 
-class BinaryStraightThroughFunction(Function):
-    @staticmethod
-    def forward(ctx, input):
-        ctx.save_for_backward(input)
-        output = where(input>=0, 1, -1)
-        return output
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        input = ctx.saved_variables
-        grad_input = grad_output.clone()
-        grad_input = grad_input * where(torch.abs(input[0]) <= 1, 1, 0)
-        return grad_input
-
 
 binary_linear = BinaryLinearFunction.apply
-bst = BinaryStraightThroughFunction.apply

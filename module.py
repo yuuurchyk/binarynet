@@ -9,9 +9,8 @@ import math
 
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 
-from function import binary_linear, bst
+from function import binary_linear
 
 class BinaryLinear(nn.Module):
     def __init__(self, in_features, out_features, bias=True):
@@ -39,14 +38,3 @@ class BinaryLinear(nn.Module):
         return self.__class__.__name__ + ' (' \
             + str(self.in_features) + ' -> ' \
             + str(self.out_features) + ')'
-
-
-class BinaryStraightThrough(nn.Module):
-    def __init__(self, inplace=False):
-        super(BinaryStraightThrough, self).__init__()
-
-    def forward(self, input):
-        return bst(input)
-
-    def __repr__(self):
-        return self.__class__.__name__ + ' ()'
