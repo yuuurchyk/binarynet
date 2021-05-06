@@ -64,9 +64,9 @@ def train_epoch(epoch, net, creterion, optimizer, train_loader, args, valid_data
         weight_clip(net.parameters())
 
         y_pred = torch.max(output, 1)[1]
-        accs += (torch.mean((y_pred == target).float())).data[0]
+        accs += (torch.mean((y_pred == target).float())).item()
 
-        losses += loss.data[0]
+        losses += loss.item()
     print("Epoch {0}: Train Loss={1:.3f}, Train Accuracy={2:.3f}".format(epoch, losses / batch_idx, accs / batch_idx))
 
     if valid_data is not None:
@@ -85,8 +85,8 @@ def test_epoch(net, creterion, test_loader, args):
         loss = creterion(output, target)
 
         y_pred = torch.max(output, 1)[1]
-        accs += (torch.mean((y_pred == target).float())).data[0]
+        accs += (torch.mean((y_pred == target).float())).item()
 
-        losses += loss.data[0]
+        losses += loss.item()
     print("\tTest Loss={0:.3f}, Test Accuracy={1:.3f}".format(losses / batch_idx, accs / batch_idx))
 
