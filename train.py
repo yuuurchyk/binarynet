@@ -13,6 +13,7 @@ import torch.optim as optim
 import torch.utils.data as data
 from torch.autograd import Variable
 from torchvision import datasets, transforms
+import numpy as np
 
 from tqdm import tqdm
 
@@ -48,13 +49,24 @@ def train(args):
     optimizer = optim.Adam(net.parameters(), lr=args.lr)
     creterion = nn.NLLLoss()
 
+    train_accs = []
+    test_accs = []
+
+    assert args.epochs > 0
     for epoch in range(1, args.epochs+1):
-        train_epoch(epoch, net, creterion, optimizer, train_loader, args)
-        test_epoch(net, creterion, test_loader, args)
+        train_acc = train_epoch(epoch, net, creterion, optimizer, train_loader, args)
+        test_acc = test_epoch(net, creterion, test_loader, args)
+
+        train_accs.append(train_acc)
+        test_accs.append(test_acc)
 
         if output_folder is not None:
             state_dict = {key: value.cpu() for key, value in net.state_dict().items()}
             torch.save(state_dict, os.path.join(output_folder, '%s.pth' % (epoch, )))
+
+    if output_folder is not None:
+        np.save(os.path.join(output_folder, 'accuracy_train.npy'), np.array(train_accs))
+        np.save(os.path.join(output_folder, 'accuracy_test.npy'), np.array(test_accs))
 
 
 def train_epoch(epoch, net, creterion, optimizer, train_loader, args, valid_data=None):
@@ -83,6 +95,8 @@ def train_epoch(epoch, net, creterion, optimizer, train_loader, args, valid_data
     if valid_data is not None:
         pass
 
+    return accs / batch_idx
+
 def test_epoch(net, creterion, test_loader, args):
     net.eval()
     losses = 0
@@ -101,3 +115,4 @@ def test_epoch(net, creterion, test_loader, args):
         losses += loss.item()
     print("\tTest Loss={0:.3f}, Test Accuracy={1:.3f}".format(losses / batch_idx, accs / batch_idx))
 
+    return accs / batch_idx
